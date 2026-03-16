@@ -96,7 +96,7 @@ class CylinderMission(Node):
         # ---------------------------------------------
         # Circle flight parameters
         # ---------------------------------------------
-        self.circle_radius = 15.0
+        self.circle_radius = 15.0 #The initial value is 15
         self.altitude = -5.0
         self.circle_speed = -0.02  # radians step per iteration
         self.theta = 0.0
@@ -106,8 +106,8 @@ class CylinderMission(Node):
         # ---------------------------------------------
         self.measured_cylinders = []
         self.points_buffer = []
-        self.sample_threshold = 10  # frames to accumulate for stable measurement
-        self.desired_distance = 15.0
+        #self.sample_threshold = 10  # frames to accumulate for stable measurement
+        self.desired_distance = 15.0 #this was an original value of 15
         self.distance_tolerance = 0.3
         self.hover_start_time = None
         self.servo_start_time = None
@@ -125,7 +125,7 @@ class CylinderMission(Node):
         # For ArUco logic
         self.markers = {}
         self.land_target = None
-
+        
         # ArUco marker pose subscriber (string topic)
         self.marker_pose_sub = self.create_subscription(
             String, '/aruco/marker_pose', self.aruco_cb, 10
@@ -394,8 +394,8 @@ class CylinderMission(Node):
             self.publish_trajectory_setpoint(self.position[0], self.position[1], self.altitude)
 
             # Check if 5 seconds have passed since entering HOVER
-            if time.time() - self.hover_start_time >= 7.0:
-                self.get_logger().info("7s hover done. Checking measurement.")
+            if time.time() - self.hover_start_time >= 5.0: #updated from 7.0 to 5.0
+                self.get_logger().info("5s hover done. Checking measurement.")
 
                 # Check if we collected bounding-box data
                 if len(self.points_buffer) > 0:
@@ -411,7 +411,7 @@ class CylinderMission(Node):
 
                     # Compare with previously measured cylinders
                     dimension_matched = False
-                    tolerance = 0.3  # example tolerance
+                    tolerance = 1.0  # example tolerance
                     for (w_old, h_old) in self.measured_cylinders:
                         if (abs(w_old - median_w) < tolerance) and (abs(h_old - median_h) < tolerance):
                             dimension_matched = True
@@ -446,7 +446,7 @@ class CylinderMission(Node):
                     self.state = "CIRCLE"
 
         elif self.state == "ARUCO_HOVER":
-            self.publish_trajectory_setpoint(x=0.0, y=0.0, z=-20.0)
+            self.publish_trajectory_setpoint(x=0.0, y=0.0, z=-20.0) #Altering this to 15.0, drone cant see Marker 0
 
             # Start timer once
             if self.aruco_hover_start_time is None:
@@ -469,7 +469,7 @@ class CylinderMission(Node):
                         best_marker_id = mid
                 if best_marker_id is not None:
                     dx, dy, dz = self.markers[best_marker_id]
-                    self.land_target = [dx, dy, -abs(20.0 - dz)]
+                    self.land_target = [dx + 0.5, dy, -abs(20.0 - dz)] #dz is the camera to drone distance, adding 2m
                     self.get_logger().info(
                         f"Selected Marker {best_marker_id} for landing at x={dx:.2f}, y={dy:.2f}, z={-abs(20.0 - dz):.2f}"
                     )
@@ -478,15 +478,16 @@ class CylinderMission(Node):
         elif self.state == "ARUCO_MOVE":
             x, y, z = self.land_target
             self.publish_trajectory_setpoint(x=x, y=y, z=z)
+
             dist = math.sqrt(
                 (self.position[0] - x)**2 +
                 (self.position[1] - y)**2 +
                 (self.position[2] - z)**2)
-            if dist < 0.5:
+            if dist < 1.5: #Increasing this causes the drone to land sooner
                 self.get_logger().info("Reached marker position. Initiating LAND.")
                 self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
                 self.state = "ARUCO_LAND"
-
+               
         elif self.state == "ARUCO_LAND":
 
             self.get_logger().info("Landed successfully. Disarming...")

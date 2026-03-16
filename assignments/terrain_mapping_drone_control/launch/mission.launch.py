@@ -4,7 +4,9 @@ import os
 
 def generate_launch_description():
     home_dir = os.environ['HOME']
-    base_path = os.path.join(home_dir, 'ros2_ws', 'src', 'terrain_mapping_drone_control', 'terrain_mapping_drone_control')
+
+    #GMB: Updating the path below since I am working out of a specific folder, and a ros ws specificall for this assignment
+    base_path = os.path.join(home_dir, 'Desktop', 'SES598', 'HW_3','ros2_ws', 'src', 'terrain_mapping_drone_control', 'terrain_mapping_drone_control')
 
     return LaunchDescription([
         # Run aruco_tracker.py with log-level WARN to hush output
