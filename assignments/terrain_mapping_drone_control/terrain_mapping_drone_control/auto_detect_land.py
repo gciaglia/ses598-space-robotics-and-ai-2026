@@ -411,7 +411,7 @@ class CylinderMission(Node):
 
                     # Compare with previously measured cylinders
                     dimension_matched = False
-                    tolerance = 1.0  # example tolerance
+                    tolerance = 3.1 # example tolerance
                     for (w_old, h_old) in self.measured_cylinders:
                         if (abs(w_old - median_w) < tolerance) and (abs(h_old - median_h) < tolerance):
                             dimension_matched = True
@@ -469,7 +469,7 @@ class CylinderMission(Node):
                         best_marker_id = mid
                 if best_marker_id is not None:
                     dx, dy, dz = self.markers[best_marker_id]
-                    self.land_target = [dx + 0.5, dy, -abs(20.0 - dz)] #dz is the camera to drone distance, adding 2m
+                    self.land_target = [dx + 0.5, dy - 0.1, -abs(20.0 - dz)] #dz is the camera to drone distance, adding 2m
                     self.get_logger().info(
                         f"Selected Marker {best_marker_id} for landing at x={dx:.2f}, y={dy:.2f}, z={-abs(20.0 - dz):.2f}"
                     )
