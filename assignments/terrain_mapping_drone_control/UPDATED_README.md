@@ -5,7 +5,7 @@ The drone falls off the cylinder, the first cylinder is not detected as a repeat
 ```bash
 git clone https://github.com/PX4/PX4-Autopilot.git
 cd PX4-Autopilot
-git checkout 5f8e3c5
+git checkout 9ac03f03eb
 bash Tools/setup/ubuntu.sh
 ```
 
