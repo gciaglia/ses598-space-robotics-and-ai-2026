@@ -21,6 +21,10 @@ https://github.com/mavlink/qgroundcontrol/releases
 
 Terminal 1: Launch the Gazebo Simulation
 ```bash
+cd ~/Desktop/SES598/HW_3/ros2_ws
+colcon build --packages-select terrain_mapping_drone_control --symlink-install
+
+
 cd ~/Desktop/SES598/HW_3/ros2_ws && source install/setup.bash
 ros2 launch terrain_mapping_drone_control cylinder_landing.launch.py
 ```

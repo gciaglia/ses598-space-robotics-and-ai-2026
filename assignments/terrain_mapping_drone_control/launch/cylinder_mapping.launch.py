@@ -7,6 +7,10 @@ from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 import os
 
+#new additions for rtab mapping
+from launch.actions import IncludeLaunchDescription #allows us to include the other launch file
+from launch.launch_description_sources import PythonLaunchDescriptionSource #tells us the file is a py file
+
 def generate_launch_description():
     """Generate launch description for cylinder landing mission."""
     
@@ -134,28 +138,47 @@ def generate_launch_description():
         arguments=['0.12', '0.03', '0.242', '0', '0', '0', 'base_link', 'OakD-Lite-Modify/base_link'],
     )
 
-     # New node for 3D mapping functionality, RTAB Node
-    rtab = Node(
-        package='rtabmap_slam',
-        executable='rtabmap',
-        name='rtabmap',
-        parameters=[{
-            'use_sim_time': True, #tells us to use the clock in gazebo, the sim time
-            'frame_id': 'base_link', #tells us the frame reference point to build the map from
-            'subscribe_depth': True, #allows us to get depth data
-        }],
+    # New node for 3D mapping functionality, RTAB Node
+    #rtab = Node(
+    #    package='rtabmap_slam',
+    #    executable='rtabmap',
+    #    name='rtabmap',
+    #    parameters=[{
+    #        'use_sim_time': True, #tells us to use the clock in gazebo, the sim time
+    #        'frame_id': 'base_link', #tells us the frame reference point to build the map from
+    #        'subscribe_depth': True, #allows us to get depth data
+    #    }],
         
-        remappings=[
-            
-            ('rgb/image', '/drone/front_rgb'), 
-            ('rgb/camera_info', '/drone/front_rgb/camera_info'),#connects the camera with 3D space
-                        
-            ('depth/image', '/drone/front_depth'),#this is the distance, depth data
-            ('odom', '/drone/odom'),#tells  us where to get odmometry data to buld the map
+   #     remappings=[
+   #         
+   #         ('rgb/image', '/drone/front_rgb'), 
+   #         ('rgb/camera_info', '/drone/front_rgb/camera_info'),#connects the camera with 3D space
+   #                     
+   #         ('depth/image', '/drone/front_depth'),#this is the distance, depth data
+   #         ('odom', '/drone/odom'),#tells  us where to get odmometry data to buld the map
 
           
-        ],
-        output='screen'
+  #      ],
+  #      output='screen'
+  #  )
+
+
+# RTAB launch with topics defined in the rtbmap.launch.py file
+    rtab = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('rtabmap_launch'), 'launch', 'rtabmap.launch.py')
+        ),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'subscribe_depth': 'true',
+            'frame_id': 'base_link',
+            'rgb_topic': '/drone/front_rgb',
+            'depth_topic': '/drone/front_depth',
+            'camera_info_topic': '/drone/front_rgb/camera_info',
+            'odom_topic': '/drone/odom',
+            'rgb_image_transport': 'raw',
+            'depth_image_transport': 'raw',
+        }.items()
     )
 
 
@@ -186,6 +209,6 @@ def generate_launch_description():
         static_tf_camera,
         TimerAction(
             period=5.0,
-            actions=[rtab]
+            actions=[rtab] #need to ensure this matches
         )
     ]) 
