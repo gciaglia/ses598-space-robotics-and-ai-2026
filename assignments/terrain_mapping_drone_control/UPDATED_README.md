@@ -47,3 +47,7 @@ Terminal 4: Start Ground Control (This needs to be completed before mission star
         chmod +x QGroundControl.AppImage
         sudo apt install libfuse2
     ```
+
+# Extra Credit
+ros2 launch terrain_mapping_drone_control cylinder_mapping.launch.py
+
