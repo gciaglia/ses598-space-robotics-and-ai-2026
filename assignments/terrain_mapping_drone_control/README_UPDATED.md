@@ -25,6 +25,8 @@ colcon build --packages-select terrain_mapping_drone_control --symlink-install
 cd ~/Desktop/SES598/HW_3/ros2_ws && source install/setup.bash
 ros2 launch terrain_mapping_drone_control cylinder_landing.launch.py
 ```
+If you remeove all the folders for a fresh build you need to rebuild the px4: colcon build --packages-select px4_msgs --symlink-install
+roo
 
 Terminal 2: Setup PX4, allows PX4 messages to be translated to ROS2 topics
 ```bash
